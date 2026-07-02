@@ -12,12 +12,13 @@ Traditional accuracy-boosting techniques like Chain-of-Thought (CoT) make the mo
 
 Prompt Repetition is a paradigm shift. By duplicating or tripling your instructional frame within a single prompt, you leverage the GPU's highly parallelized prefill stage to boost self-attention paths. This simulator visualizes these trade-offs, helping technical PMs and engineers identify the most cost-efficient operational frontier for their production pipelines.
 
-## ✨ Key Features
 
-* **Interactive Pareto Frontier:** Real-time plotting of Accuracy vs. Resource Footprint (tokens) based on model presets, instruction sizes, and hardware throughput configs.
-* **Causal Attention Visualizer:** An interactive token matrix showing the directional attention limits of standard causal transformers versus the bidirectional lookback safety of repeated prompts.
-* **Live Prompt playground:** A sandbox to engineer repeated prompt templates, estimate tokens, and test real execution paths live (utilizing local Gemini API keys).
-* **Automated Memo Compiler:** Single-click export of structured markdown Product Requirement Documents (PRDs) or strategic cost proposals directly to your clipboard.
+
+## 🛠️ Deep Dive on Trade-offs
+
+* **The 1x Baseline Trap:** While it is the cheapest option, models easily suffer from attention decay (forgetting instructions or lists in the middle of a prompt) because they only read the instructions once.
+* **The 2x and 3x Advantage:** Repeating the instructions twice or three times acts as a "second read." Since modern AI chips read input tokens in parallel (prefill), adding extra repetition tokens does not slow down the response time for the user. It drastically increases accuracy on extraction tasks for a fraction of the cost of CoT.
+* **Why CoT is Different:** Chain of Thought ("think step-by-step") is fantastic for logic, but it forces the model to generate hundreds of "thinking" tokens. Because models generate text one word at a time, this makes your application slow and expensive.
 
 ## 🟢 Best-Fit Scenarios (Optimal Use Cases)
 
@@ -36,6 +37,13 @@ This technique is a poor fit and should be bypassed under the following conditio
 * **Reasoning-Enabled Engines:** Advanced models running explicit internal thinking paths (e.g., o1, Gemini Thinking) as they already anchor attention.
 * **Tight Context Window Caps:** Extreme edge-case context configurations where duplicating the instructions would trigger context overflows.
 
+## ✨ Key Features
+
+* **Interactive Pareto Frontier:** Real-time plotting of Accuracy vs. Resource Footprint (tokens) based on model presets, instruction sizes, and hardware throughput configs.
+* **Causal Attention Visualizer:** An interactive token matrix showing the directional attention limits of standard causal transformers versus the bidirectional lookback safety of repeated prompts.
+* **Live Prompt playground:** A sandbox to engineer repeated prompt templates, estimate tokens, and test real execution paths live (utilizing local Gemini API keys).
+* **Automated Memo Compiler:** Single-click export of structured markdown Product Requirement Documents (PRDs) or strategic cost proposals directly to your clipboard.
+
 ## 🌐 Enterprise Data Privacy & Security
 
 This tool runs 100% locally in the user's browser context.
@@ -45,7 +53,6 @@ This tool runs 100% locally in the user's browser context.
 ## 📚 Acknowledgements & References
 
 * **Research Basis:** Google Research - Prompt Repetition Improves Non-Reasoning LLMs (Yaniv Leviathan, Matan Kalman, Yossi Matias)
-
 * **Model Benchmark Specs:** Based on evaluations from MMLU, NameIndex, MiddleMatch, ARC, and MATH problem sets.
 
 Disclaimer: This sandbox is an educational and analytical portfolio project designed to simulate prompt-engineering efficiency frontiers. It is not an official Google product.
