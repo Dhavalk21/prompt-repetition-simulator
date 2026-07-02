@@ -2,7 +2,7 @@
 
 An interactive analytics and sandbox engine designed to model the cost-to-accuracy trade-offs of Prompt Repetition versus standard and Chain-of-Thought (CoT) prompting strategies. 
 
-This application is inspired by and models the empirical findings of Google Research's paper: "Prompt Repetition Improves Non-Reasoning LLMs" (arXiv:2512.14982).
+This application is inspired by and models the empirical findings of Google Research's paper: "[Prompt Repetition Improves Non-Reasoning LLMs" (arXiv:2512.14982)](https://arxiv.org/pdf/2512.14982).
 
 ### 🔗 Live Link: [View Interactive App Here](https://dhavalk21.github.io/prompt-repetition-simulator/)
 
