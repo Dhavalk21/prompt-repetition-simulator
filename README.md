@@ -1,10 +1,10 @@
-# 📈 LLM Prompt Repetition & Pareto Frontier Simulator
+# ⚡ LLM Prompt Repetition & Pareto Frontier Simulator
 
 An interactive analytics and sandbox engine designed to model the cost-to-accuracy trade-offs of Prompt Repetition versus standard and Chain-of-Thought (CoT) prompting strategies. This application is inspired by and models the empirical findings of Google Research's paper: "Prompt Repetition Improves Non-Reasoning LLMs" (arXiv:2512.14982).
 
-### 🔗 Live Link: [View Interactive App Here](https://dhavalk21.github.io/rag-pipeline-and-token-cost-optimizer/)
+### 🔗 Live Link: [View Interactive App Here](https://dhavalk21.github.io/prompt-repetition-simulator/)
 
-## 🎯 The Product "Why"
+## 💡 The Product "Why"
 
 When building LLM-powered applications, product teams often face a hard choice between accuracy and operating margins/latency.
 
@@ -14,13 +14,27 @@ Prompt Repetition is a paradigm shift. By duplicating or tripling your instructi
 
 ## ✨ Key Features
 
-* **Interactive SVG Pareto Frontier:** Real-time plotting of Accuracy vs. Resource Footprint (tokens) based on model presets, instruction sizes, and hardware throughput configs.
-
+* **Interactive Pareto Frontier:** Real-time plotting of Accuracy vs. Resource Footprint (tokens) based on model presets, instruction sizes, and hardware throughput configs.
 * **Causal Attention Visualizer:** An interactive token matrix showing the directional attention limits of standard causal transformers versus the bidirectional lookback safety of repeated prompts.
-
 * **Live Prompt playground:** A sandbox to engineer repeated prompt templates, estimate tokens, and test real execution paths live (utilizing local Gemini API keys).
-
 * **Automated Memo Compiler:** Single-click export of structured markdown Product Requirement Documents (PRDs) or strategic cost proposals directly to your clipboard.
+
+## 🟢 Best-Fit Scenarios (Optimal Use Cases)
+
+Prompt Repetition acts as a highly efficient cognitive anchor. It is best applied to:
+
+* **Long-Context Key-Value Extraction:** Retrieving specific data points or parameters hidden deep inside dense, unstructured documents.
+* **Positional Distractor Sifting:** Pulling information located in the "middle" of list structures where models typically suffer context degradation.
+* **Options-First Multiple Choice:** Formatting options and rules ahead of the target question to prime attention associations early.
+* **Strict JSON Automation Workflows:** Scaling high-volume, structured extraction tasks that must bypass slow, verbose conversational yapping.
+
+## 🔴 Constraints & Anti-Patterns (Where to Avoid)
+
+This technique is a poor fit and should be bypassed under the following conditions:
+
+* **Multi-Step Symbolic Logic:** Calculations, deep coding scripts, or multi-phase puzzles that require sequential thinking loops.
+* **Reasoning-Enabled Engines:** Advanced models running explicit internal thinking paths (e.g., o1, Gemini Thinking) as they already anchor attention.
+* **Tight Context Window Caps:** Extreme edge-case context configurations where duplicating the instructions would trigger context overflows.
 
 ## 🌐 Enterprise Data Privacy & Security
 
