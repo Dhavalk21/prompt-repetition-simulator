@@ -53,8 +53,8 @@ This technique is a poor fit and should be bypassed under the following conditio
 To help business stakeholders and product owners quickly understand the business case, this table translates technical performance gains into clear operational outcomes:
 | Business Goal / Benefit | Target Metric | How it Helps the Business |
 | :--- | :--- | :--- |
-| **Higher Accuracy & Success Rates** | **Up to** $+76\%$ **better results** | Prevents the AI from missing key details when searching through long documents or cluttered data. |
-| **Lower Operational Costs** | **$60\% - 80\%$ reduction in API fees** | Saves money by getting straight to the answer without paying for the AI to "think out loud" first. |
+| **Higher Accuracy & Success Rates** | **Up to +76% better results** | Prevents the AI from missing key details when searching through long documents or cluttered data. |
+| **Lower Operational Costs** | **60% to 80% reduction in API fees** | Saves money by getting straight to the answer without paying for the AI to "think out loud" first. |
 | **Faster Speeds & No Delays** | **Near-instant answer delivery** | Uses smart parallel processing to double-check instructions without keeping users waiting. |
 | **Fewer System Errors** | **Clean, reliable data formats** | Keeps the AI strictly focused on rules, stopping formatting mistakes before they reach customers. |
 
