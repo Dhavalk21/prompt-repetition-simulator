@@ -12,7 +12,16 @@ Traditional accuracy-boosting techniques like Chain-of-Thought (CoT) make the mo
 
 Prompt Repetition is a paradigm shift. By duplicating or tripling your instructional frame within a single prompt, you leverage the GPU's highly parallelized prefill stage to boost self-attention paths. This simulator visualizes these trade-offs, helping technical PMs and engineers identify the most cost-efficient operational frontier for their production pipelines.
 
+## 🔍 Comparative Breakdown: 1x, 2x, 3x vs. Chain of Thought (CoT)
 
+To help you choose the right design pattern for your AI pipelines, here is a direct comparison of standard baseline, repeated prompting formats, and reasoning structures:
+
+| Strategy | Accuracy Improvement | Expected Cost | Latency (Speed) | Best Used For |
+| :--- | :--- | :--- | :--- | :--- |
+| **1x Baseline** | ⚪ None (Baseline) | 🟢 Baseline (Lowest input fee) | 🟢 Instant (Zero prefill overhead) | Simple, direct instructions; short context lookups. |
+| **2x Prompt Repetition** | 🟡 High (Up to +75% on extraction) | 🟡 Slight Increase ($2\times$ input tokens) | 🟢 Fast (Parallel GPU prefill bounds delay) | General list searches, data extraction, and MMLU-style option sorting. |
+| **3x Prompt Repetition** | 🟢 Maximum (Up to +78% on positional tasks) | 🟡 Moderate Increase ($3\times$ input tokens) | 🟢 Fast (Concurrently read by hardware) | Hard positional tasks ("needle-in-a-haystack") with extensive background noise. |
+| **Chain of Thought (CoT)** | 🟢 Very High (Strong reasoning logic) | 🔴 Drastic Increase (Premium output token fees) | 🔴 Slow (Must type out complete reasoning path) | Complex math, programming, or multi-step logic puzzles. |
 
 ## 🛠️ Deep Dive on Trade-offs
 
@@ -36,6 +45,16 @@ This technique is a poor fit and should be bypassed under the following conditio
 * **Multi-Step Symbolic Logic:** Calculations, deep coding scripts, or multi-phase puzzles that require sequential thinking loops.
 * **Reasoning-Enabled Engines:** Advanced models running explicit internal thinking paths (e.g., o1, Gemini Thinking) as they already anchor attention.
 * **Tight Context Window Caps:** Extreme edge-case context configurations where duplicating the instructions would trigger context overflows.
+
+## 💼 Simplified Business Value & KPIs (Operational Benefits)
+
+To help business stakeholders and product owners quickly understand the business case, this table translates technical performance gains into clear operational outcomes:
+| Business Goal / Benefit | Target Metric | How it Helps the Business |
+| :--- | :--- | :--- |
+| **Higher Accuracy & Success Rates** | **Up to** $+76\%$ **better results** | Prevents the AI from missing key details when searching through long documents or cluttered data. |
+| **Lower Operational Costs** | **$60\% - 80\%$ reduction in API fees** | Saves money by getting straight to the answer without paying for the AI to "think out loud" first. |
+| **Faster Speeds & No Delays** | **Near-instant answer delivery** | Uses smart parallel processing to double-check instructions without keeping users waiting. |
+| **Fewer System Errors** | **Clean, reliable data formats** | Keeps the AI strictly focused on rules, stopping formatting mistakes before they reach customers. |
 
 ## ✨ Key Features
 
