@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Prompt Repetition & Pareto Efficiency Simulator</title>
+    <!-- Tailwind CSS (V4) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* High-definition, ultra-crisp typography overrides */
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: subpixel-antialiased;
+            -moz-osx-font-smoothing: auto;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* Custom scrollbar styling for premium dark UI */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        /* High-fidelity CSS Tooltip Engine */
+        .tooltip-box {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+            transform: translateY(4px);
+        }
+        .tooltip-trigger:hover .tooltip-box {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans min-h-screen antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Brand & Layout Header Styled after RAG Simulator -->
+        <header class="border-b border-slate-900 pb-6 mb-8 space-y-4">
+            <!-- Top Badges Row -->
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="text-xs bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 px-3.5 py-1 rounded-full font-bold shadow-sm shadow-indigo-950/20">
+                    AI &amp; Analytics • Product Management Tool
+                </span>
+                <div class="text-xs bg-slate-900/90 border border-slate-800 text-slate-200 px-3.5 py-1 rounded-full font-bold flex items-center gap-2 shadow-md shadow-slate-950/40">
+                    <span class="text-slate-100">Designed by Dhaval Kareliya</span>
+                    <span class="text-slate-700">|</span>
+                    <a href="https://linkedin.com" target="_blank" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">
+                        <svg class="w-3.5 h-3.5 fill-current text-indigo-400" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                        LinkedIn
+                    </a>
+                    <span class="text-slate-700">|</span>
+                    <a href="https://github.com/Dhavalk21" target="_blank" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">
+                        <svg class="w-3.5 h-3.5 fill-current text-indigo-400" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+                        GitHub
+                    </a>
+                </div>
+            </div>
+
+            <!-- Title & Subtitle Grid containing the Show Guide Button & Metrics Badges -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div class="flex-1">
+                    <h1 class="text-3xl font-black tracking-tight text-white bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-200">
+                        Prompt Repetition &amp; Pareto Frontier
+                    </h1>
+                    <p class="text-slate-400 mt-2 text-sm max-w-3xl leading-relaxed">
+                        Analyzing attention architectures, latency parallelization, and accuracy dynamics under Google Research (arXiv:2512.14982).
+                    </p>
+                </div>
+                
+                <!-- Combined Actions & Metrics Panel -->
+                <div class="flex flex-wrap items-center gap-4 shrink-0">
+                    <!-- Quick Target Metrics Badge Group (Brought back to side of the button) -->
+                    <div class="flex items-center gap-4 text-xs bg-slate-900/40 p-3 rounded-xl border border-slate-900/80">
+                        <div>
+                            <span class="text-slate-500 block uppercase font-bold text-[9px] tracking-wider">Latency Profile</span>
+                            <strong class="text-emerald-400 font-mono text-xs">Parallel Prefill (&Delta; &approx; 0)</strong>
+                        </div>
+                        <div class="border-l border-slate-800 h-8"></div>
+                        <div>
+                            <span class="text-slate-500 block uppercase font-bold text-[9px] tracking-wider">Maximum Accuracy Shift</span>
+                            <strong class="text-indigo-400 font-mono text-xs">Up to +76% Gain</strong>
+                        </div>
+                    </div>
+
+                    <!-- Show Guide Button -->
+                    <button onclick="toggleGuide()" class="border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 font-bold px-5 py-3 rounded-xl text-xs transition-all shadow-md cursor-pointer flex items-center gap-1.5 whitespace-nowrap h-[50px]">
+                        <span id="guideBtnText">Show Guide</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Collapsible Guide Section -->
+            <div id="guideSection" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                <div class="mt-4 p-6 bg-slate-900/30 border border-slate-900 rounded-2xl space-y-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
+                        <span>ℹ️</span> About this Simulator &amp; Execution Guide
+                    </h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        This interactive simulator models the <strong>Cost-to-Accuracy Frontier</strong> for prompt optimization pipelines, mapping Google's landmark research on prompt repetition. 
+                        Traditional prompting strategies force model pipelines to write complex "Chain-of-Thought" (CoT) internal monologues. While highly accurate, this increases output token footprints—scaling operational runtime costs and latencies.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 border-t border-slate-900">
+                        <div class="space-y-1.5">
+                            <h4 class="text-xs font-bold text-indigo-300 flex items-center gap-1">📈 How to Use the Simulator</h4>
+                            <ul class="text-[11px] text-slate-400 list-disc list-inside space-y-1 leading-relaxed">
+                                <li>Select a target benchmark preset (like <strong>NameIndex</strong>) on the left panel settings.</li>
+                                <li>Configure the prompt size and GPU prefill parameters to match your target hardware.</li>
+                                <li>Compare accuracy gains and token costs across the <strong>Pareto Frontier</strong>.</li>
+                            </ul>
+                        </div>
+                        <div class="space-y-1.5">
+                            <h4 class="text-xs font-bold text-emerald-300 flex items-center gap-1">🧠 Prompt Repetition Mechanics</h4>
+                            <ul class="text-[11px] text-slate-400 list-disc list-inside space-y-1 leading-relaxed">
+                                <li>Observe context queries directly via the <strong>Attention Visualizer</strong>.</li>
+                                <li>Configure custom instructions inside the <strong>Live Prompt Playground</strong>.</li>
+                                <li>Instantly compile optimization proposals inside the <strong>Strategic Memo Builder</strong>.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace Tabs -->
+        <div class="flex border-b border-slate-900 mb-8 overflow-x-auto gap-2">
+            <button onclick="switchTab('sandbox')" id="tabBtn-sandbox" class="tab-btn px-4 py-3 text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 focus:outline-none transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap">
+                <span>📈</span> Frontier Sandbox &amp; Playground
+            </button>
+            <button onclick="switchTab('attention')" id="tabBtn-attention" class="tab-btn px-4 py-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-800 focus:outline-none transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap">
+                <span>🧠</span> Attention Visualizer
+            </button>
+            <button onclick="switchTab('memo')" id="tabBtn-memo" class="tab-btn px-4 py-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-800 focus:outline-none transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap">
+                <span>📋</span> Strategic Memo Builder
+            </button>
+            <button onclick="switchTab('references')" id="tabBtn-references" class="tab-btn px-4 py-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-800 focus:outline-none transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap">
+                <span>📚</span> References &amp; Sources
+            </button>
+        </div>
+
+        <!-- ================= TAB CONTENT 1: SANDBOX + PLAYGROUND CONSOLIDATED ================= -->
+        <div id="tabContent-sandbox" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Left Panel: Settings Controls -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-slate-900/40 border border-slate-900 rounded-2xl p-6 backdrop-blur-sm shadow-xl relative overflow-hidden">
+                    <div class="absolute -top-12 -right-12 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                    
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-white mb-4 flex items-center gap-2">
+                        <span class="text-indigo-400">⚙️</span> Control Settings
+                    </h2>
+
+                    <!-- Task Preset Selection -->
+                    <div class="mb-5 relative group">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">
+                                Task Benchmark Archetype
+                            </label>
+                            <!-- Tooltip Trigger -->
+                            <span class="tooltip-trigger relative cursor-help text-slate-500 hover:text-slate-300 text-xs">
+                                ℹ️
+                                <div class="tooltip-box absolute bottom-6 right-0 w-64 bg-slate-900 text-slate-300 text-[11px] p-3 rounded-lg shadow-2xl border border-slate-800 z-50 font-normal leading-relaxed">
+                                    <p class="font-bold text-white mb-1">💡 Recommended Presets</p>
+                                    Use <strong class="text-indigo-300">NameIndex</strong> for long-context recall, or <strong class="text-indigo-300">MMLU Options-First</strong> to witness how spatial arrangement affects causal attention windows.
+                                </div>
+                            </span>
+                        </div>
+                        <select id="presetSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs font-semibold text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors" onchange="updateSim()">
+                            <option value="nameindex">NameIndex (Custom Long Context - Mid Retrieval)</option>
+                            <option value="middlematch">MiddleMatch (Custom Positional Disorientation)</option>
+                            <option value="multiplechoice_options">Multiple Choice (Options-First Sequence)</option>
+                            <option value="multiplechoice_question">Multiple Choice (Question-First Sequence)</option>
+                            <option value="math_hard">Symbolic Hard Reasoning (GSM8K/MATH)</option>
+                        </select>
+                    </div>
+
+                    <!-- Model Selection -->
+                    <div class="mb-5 relative">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">
+                                Model Architecture In-Use
+                            </label>
+                            <span class="tooltip-trigger relative cursor-help text-slate-500 hover:text-slate-300 text-xs">
+                                ℹ️
+                                <div class="tooltip-box absolute bottom-6 right-0 w-64 bg-slate-900 text-slate-300 text-[11px] p-3 rounded-lg shadow-2xl border border-slate-800 z-50 font-normal leading-relaxed">
+                                    <p class="font-bold text-white mb-1">💡 Architecture Impact</p>
+                                    Smaller, highly parallelized engines like <strong class="text-indigo-300">Gemini 2.0 Flash-Lite</strong> handle massive prefill repetition with zero perceivable user latency penalty.
+                                </div>
+                            </span>
+                        </div>
+                        <select id="modelSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs font-semibold text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors" onchange="updateSim()">
+                            <option value="gemini_flash_lite">Gemini 2.0 Flash-Lite (Low Latency / High Prefill Parallel)</option>
+                            <option value="gemini_flash">Gemini 2.0 Flash (Optimized Standard)</option>
+                            <option value="gpt4o_mini">GPT-4o Mini (Sub-tier Core)</option>
+                            <option value="gpt4o">GPT-4o (Enterprise Flagship)</option>
+                            <option value="claude_sonnet">Claude 3.7 Sonnet (Advanced Generalist)</option>
+                            <option value="deepseek_v3">DeepSeek V3 (Multi-Headed Latency Scale)</option>
+                        </select>
+                    </div>
+
+                    <!-- Input Metrics Configuration Sliders -->
+                    <div class="space-y-5 pt-4 border-t border-slate-800/60">
+                        <!-- Base Instruction Slider -->
+                        <div class="relative">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                    Base Instruction Set Size
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <span id="promptSizeVal" class="text-xs text-indigo-400 font-mono font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-800/80">1,500 tkn</span>
+                                    <span class="tooltip-trigger relative cursor-help text-slate-500 hover:text-slate-300 text-xs">
+                                        ℹ️
+                                        <div class="tooltip-box absolute bottom-6 right-0 w-64 bg-slate-900 text-slate-300 text-[11px] p-3 rounded-lg shadow-2xl border border-slate-800 z-50 font-normal leading-relaxed">
+                                            <p class="font-bold text-white mb-1">💡 Ideal Value Guidance</p>
+                                            Keep instructions between <strong class="text-indigo-300">500 to 2,000 tokens</strong> for production loops to optimize prefill costs.
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                            <input id="promptSizeSlider" type="range" min="200" max="8000" step="100" value="1500" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500" oninput="updateSim()">
+                        </div>
+
+                        <!-- Prefill Speed Slider -->
+                        <div class="relative">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                    GPU Prefill Throughput
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <span id="prefillSpeedVal" class="text-xs text-indigo-400 font-mono font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-800/80">40,000 t/s</span>
+                                    <span class="tooltip-trigger relative cursor-help text-slate-500 hover:text-slate-300 text-xs">
+                                        ℹ️
+                                        <div class="tooltip-box absolute bottom-6 right-0 w-64 bg-slate-900 text-slate-300 text-[11px] p-3 rounded-lg shadow-2xl border border-slate-800 z-50 font-normal leading-relaxed">
+                                            <p class="font-bold text-white mb-1">💡 Throughput Rates</p>
+                                            <strong class="text-emerald-400">Modern GPUs (H100/A100)</strong> execute batch prefill at over <strong class="text-indigo-300">30k–80k t/s</strong>, making repetition practically instantaneous.
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                            <input id="prefillSpeedSlider" type="range" min="10000" max="100000" step="5000" value="40000" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500" oninput="updateSim()">
+                        </div>
+                    </div>
+
+                    <!-- Global Logic Switches -->
+                    <div class="mt-6 pt-5 border-t border-slate-800/60 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                                Force Active Reasoning Layer
+                                <span class="tooltip-trigger relative cursor-help text-slate-500 hover:text-slate-300 text-xs">
+                                    ℹ️
+                                    <div class="tooltip-box absolute bottom-6 left-0 w-64 bg-slate-900 text-slate-300 text-[11px] p-3 rounded-lg shadow-2xl border border-slate-800 z-50 font-normal normal-case tracking-normal leading-relaxed">
+                                        <p class="font-bold text-white mb-1">💡 Reasoning Interaction</p>
+                                        When active, the model generates internal thinking tokens. This flattens direct prompt repetition gains since the model performs internal restructures automatically.
+                                    </div>
+                                </span>
+                            </span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input id="reasoningToggle" type="checkbox" class="sr-only peer" onchange="updateSim()">
+                                <div class="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strategic Summary Insights -->
+                <div class="bg-indigo-950/20 border border-indigo-900/30 rounded-2xl p-5 space-y-3 shadow-md">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-indigo-400 flex items-center gap-1.5">
+                        <span>🧪</span> Core Theoretical Insights
+                    </h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Causal attention mechanisms process tokens left-to-right. Prompt repetition wraps bidirectional lookbacks natively inside the context window.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right Panel: Chart, Performance Matrix & Integrated Playground -->
+            <div class="lg:col-span-8 space-y-6">
+                <!-- SVG Interactive Chart Card -->
+                <div class="bg-slate-900/20 border border-slate-800/80 rounded-2xl p-6 shadow-xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200">Pareto Frontier: Accuracy vs System Footprint</h3>
+                            <p class="text-xs text-slate-500">Visualization of prompt strategy efficiency relative to computed tokens.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-4 text-xs font-bold">
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span> Baseline</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Repetition (x2)</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span> Repetition (x3)</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Step-by-Step (CoT)</span>
+                        </div>
+                    </div>
+
+                    <!-- Responsive SVG Area -->
+                    <div class="w-full bg-slate-950 border border-slate-900 rounded-xl p-4 relative shadow-inner">
+                        <svg id="paretoChart" viewBox="0 0 600 320" class="w-full h-auto overflow-visible"></svg>
+                    </div>
+                </div>
+
+                <!-- Benchmark Comparison Matrix -->
+                <div class="bg-slate-900/20 border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl">
+                    <div class="px-6 py-4 border-b border-slate-800/80 bg-slate-900/30">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Pipeline Performance Matrix</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-900/60 text-slate-400 uppercase tracking-wider font-bold border-b border-slate-800/60">
+                                    <th class="p-4">Prompt Strategy</th>
+                                    <th class="p-4">Accuracy Scale</th>
+                                    <th class="p-4">Input Load</th>
+                                    <th class="p-4">Est. Cost / 100k Runs</th>
+                                    <th class="p-4">Estimated Latency</th>
+                                    <th class="p-4">Primary Attribute</th>
+                                </tr>
+                            </thead>
+                            <tbody id="metricTableBody" class="divide-y divide-slate-800/40 text-slate-300">
+                                <!-- Dynamics injected by updateSim() -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- INTEGRATED LIVE PROMPT PLAYGROUND (Combined from 3rd Tab) -->
+                <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+                    <div class="border-b border-slate-800/80 pb-4 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200">Live Prompt Playground</h3>
+                            <p class="text-xs text-slate-500">Test repetition wrappers in real-time on custom inputs.</p>
+                        </div>
+                        <span class="text-[10px] font-bold text-indigo-400 uppercase bg-indigo-950/80 px-2.5 py-1 rounded border border-indigo-900/50">Sim Engine Active</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Playground Inputs (Left side of playground panel) -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">User Prompt Input</label>
+                                <textarea id="playUserPrompt" class="w-full h-36 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-300 focus:outline-none focus:border-indigo-500 leading-relaxed" placeholder="List of Names:
+Dhaval, John, Clara, Sarah.
+
+Question: What is the 3rd name in this sequence?"></textarea>
+                            </div>
+
+                            <div class="relative">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Repetition Pattern Selection</label>
+                                    <span class="tooltip-trigger relative cursor-help text-slate-500 hover:text-slate-300 text-xs">
+                                        ℹ
+                                        <div class="tooltip-box absolute bottom-6 right-0 w-64 bg-slate-900 text-slate-300 text-[11px] p-3 rounded-lg shadow-2xl border border-slate-800 z-50 font-normal leading-relaxed normal-case tracking-normal">
+                                            <p class="font-bold text-white mb-1">💡 Strategy Choice</p>
+                                            <strong class="text-indigo-300">x2 (Verbose)</strong> is optimal for MMLU and reasoning tasks. <strong class="text-indigo-300">x3 Pattern</strong> boosts accuracy peak scores for needle matching.
+                                        </div>
+                                    </span>
+                                </div>
+                                <select id="playPatternSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-300 focus:outline-none focus:border-indigo-500" onchange="updatePlaygroundPrompt()">
+                                    <option value="baseline">Baseline (Standard Single Prompt)</option>
+                                    <option value="rep_x2">Prompt Repetition x2 (Verbose Wrapper)</option>
+                                    <option value="rep_x3">Prompt Repetition x3 (High Density)</option>
+                                </select>
+                            </div>
+
+                            <!-- Live Gemini API Call Setup -->
+                            <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-4 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-300">Enable Live Gemini API Call</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input id="apiToggle" type="checkbox" class="sr-only peer" onchange="toggleApiSettings()">
+                                        <div class="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    </label>
+                                </div>
+                                <div id="apiSettingsBlock" class="hidden space-y-2 pt-2 border-t border-slate-900">
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Gemini API Key (Local Execution)</label>
+                                    <input id="customApiKey" type="password" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs font-mono text-slate-300 focus:outline-none focus:border-indigo-500" placeholder="Paste Gemini API Key">
+                                </div>
+                            </div>
+
+                            <button id="playgroundRunBtn" onclick="runPlaygroundInference()" class="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-xs py-3 rounded-xl transition-all shadow-md shadow-indigo-950 flex items-center justify-center gap-2 cursor-pointer">
+                                <span>🚀</span> Run Repetition Evaluation
+                            </button>
+                        </div>
+
+                        <!-- Playground Outputs (Right side of playground panel) -->
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-slate-950 rounded-xl p-4 border border-slate-900">
+                                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Estimated Size</span>
+                                    <div id="playTokenCount" class="text-lg font-black font-mono text-white mt-1">28 t</div>
+                                </div>
+                                <div class="bg-slate-950 rounded-xl p-4 border border-slate-900">
+                                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Cost Multiplier</span>
+                                    <div id="playEstimatedCost" class="text-lg font-black font-mono text-indigo-400 mt-1">1x baseline</div>
+                                </div>
+                            </div>
+
+                            <!-- Processed Assembly Output -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Generated Sequence Package</label>
+                                <div id="playFormattedPrompt" class="w-full min-h-[100px] max-h-[120px] bg-slate-950 border border-slate-900 rounded-xl p-3 font-mono text-xs text-slate-300 whitespace-pre-wrap overflow-y-auto leading-relaxed">System awaiting configuration input...</div>
+                            </div>
+
+                            <!-- Final Generation Output -->
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Model Response</label>
+                                    <span id="playgroundStatus" class="text-[10px] text-slate-500 font-mono font-bold bg-slate-950 px-2 py-0.5 rounded border border-slate-900/60">Idle</span>
+                                </div>
+                                <div id="playResponseOutput" class="w-full min-h-[120px] max-h-[140px] bg-slate-950 border border-slate-900 rounded-xl p-3 font-mono text-xs text-emerald-400 whitespace-pre-wrap overflow-y-auto leading-relaxed">Output will render here...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB CONTENT 2: ATTENTION VISUALIZER ================= -->
+        <div id="tabContent-attention" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <h3 class="text-base font-bold text-white mb-2">Attention Wrapping (Visual Representation)</h3>
+                <p class="text-xs text-slate-400 max-w-3xl mb-6">
+                    LLMs utilize causal self-attention. When a model processes a prompt, any given token can only attend to previous tokens. Our interactive grid shows how standard prompt sequence is bounded compared to the repeated structure.
+                </p>
+
+                <!-- Configuration Buttons -->
+                <div class="flex gap-4 mb-6">
+                    <button onclick="setAttentionView('standard')" id="attBtn-standard" class="bg-slate-800 text-slate-200 text-xs font-bold px-4 py-2.5 rounded-lg border border-slate-700/60 focus:outline-none transition-all cursor-pointer">
+                        Standard Causal Attention (1x)
+                    </button>
+                    <button onclick="setAttentionView('repeated')" id="attBtn-repeated" class="bg-indigo-600/10 text-indigo-400 text-xs font-bold px-4 py-2.5 rounded-lg border border-indigo-900/50 focus:outline-none transition-all cursor-pointer">
+                        Repeated Sequence Connection (2x)
+                    </button>
+                </div>
+
+                <!-- Dynamic Grid Simulator -->
+                <div class="bg-slate-950 p-6 rounded-xl border border-slate-900 shadow-inner relative">
+                    <div id="attentionHeader" class="text-xs font-bold text-slate-500 mb-4 uppercase tracking-wider">Loading...</div>
+                    
+                    <!-- Token Stream -->
+                    <div id="tokenStream" class="flex flex-wrap gap-2.5 mb-8">
+                        <!-- Dynamic Tokens Injected -->
+                    </div>
+
+                    <!-- Connection Visualization Area -->
+                    <div id="attentionCanvasContainer" class="relative h-24 bg-slate-900/40 border border-slate-800/50 rounded-lg p-4 overflow-hidden">
+                        <svg id="attentionLinesSvg" class="absolute inset-0 w-full h-full pointer-events-none opacity-80"></svg>
+                        <div class="relative z-10 flex flex-col justify-between h-full">
+                            <div class="text-[10px] text-indigo-400/80 font-mono">Interactive Vector Stream Map: Hover over tokens to track query paths.</div>
+                            <div class="text-[10px] text-slate-500 font-mono">Lines highlight where the Transformer is establishing self-attention weights.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div class="bg-slate-900/20 border border-slate-850 rounded-xl p-5">
+                        <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-2">⚠️ The "Middle-of-Context" Failure</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Because LLMs attend from left to right, parameters are frequently optimized towards the beginning or end of requests. Prompt repetition allows tokens at the start of your request to be targeted by subsequent cross-context lookups.
+                        </p>
+                    </div>
+                    <div class="bg-slate-900/20 border border-slate-850 rounded-xl p-5">
+                        <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-2">⚡ Parallel Prefill (Theoretical Speed)</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Standard generation executes sequentially. However, prefill reads all prompt tokens in parallel on your GPU hardware. This is why duplication does not scale your E2E response latency incrementally.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB CONTENT 3: MEMO BUILDER ================= -->
+        <div id="tabContent-memo" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <h3 class="text-base font-bold text-white">Interactive Strategic Memo Generator</h3>
+                        <p class="text-xs text-slate-400">Generate executive-level PRD briefs or cost optimization briefs natively using currently selected values.</p>
+                    </div>
+                    <button onclick="copyMemoToClipboard()" class="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 self-start sm:self-center cursor-pointer">
+                        <span>📋</span> Copy Memo Content
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-4 space-y-4">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Select Memo Document Type</label>
+                        <div class="space-y-2">
+                            <button onclick="selectMemoType('prd')" id="memoType-prd" class="w-full text-left bg-indigo-600/10 text-xs font-bold p-4 rounded-xl border border-indigo-900/50 flex flex-col gap-1 transition-all cursor-pointer">
+                                <span class="text-white">🚀 PRD Integration Specification</span>
+                                <span class="text-slate-400 text-[10px] font-normal">Formal spec to justify prompt repetition in engineering backlogs.</span>
+                            </button>
+                            <button onclick="selectMemoType('cost')" id="memoType-cost" class="w-full text-left bg-slate-950 text-xs font-bold p-4 rounded-xl border border-slate-900 hover:bg-slate-900 flex flex-col gap-1 transition-all cursor-pointer">
+                                <span class="text-indigo-400">📉 Cost &amp; Latency Optimization Proposal</span>
+                                <span class="text-slate-400 text-[10px] font-normal">Business memo explaining cost tradeoffs over reasoning chains.</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-8">
+                        <textarea id="memoDocDisplay" readonly class="w-full h-80 bg-slate-950 border border-slate-900 rounded-xl p-5 font-mono text-xs text-indigo-200 focus:outline-none resize-none leading-relaxed"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB CONTENT 4: REFERENCES & SOURCES (Attribution Updated) ================= -->
+        <div id="tabContent-references" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-8 shadow-xl space-y-8">
+                <!-- Academic Reference Header -->
+                <div class="border-b border-slate-800 pb-6">
+                    <h3 class="text-lg font-bold text-white mb-1.5 flex items-center gap-2">
+                        <span>📚</span> Original Research &amp; Attribution Details
+                    </h3>
+                    <p class="text-xs text-slate-400">
+                        This sandbox acts as an educational, interactive simulation framework based on research published by Google Research. 
+                        <strong>We are not the original authors of the paper.</strong>
+                    </p>
+                </div>
+
+                <!-- Paper Block -->
+                <div class="grid grid-cols-1 gap-6 bg-slate-950 p-6 rounded-xl border border-slate-900">
+                    <div class="space-y-4">
+                        <span class="text-[10px] font-bold text-indigo-400 uppercase bg-indigo-950/80 px-2.5 py-1 rounded border border-indigo-900/60 font-mono">arXiv:2512.14982 [cs.LG]</span>
+                        <h4 class="text-md font-bold text-white">Prompt Repetition Improves Non-Reasoning LLMs</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            <strong>Abstract Summary:</strong> LLMs are frequently trained as causal language models, meaning past tokens cannot attend to future tokens. Order sequences inherently bias processing performance. By repeating input strings back-to-back, the transformer forces all prompt parameters to establish complex attention associations prior to output generation. This technique improves accuracy without increasing latency or output tokens.
+                        </p>
+                        <div class="pt-2">
+                            <a href="https://arxiv.org/abs/2512.14982" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 font-bold transition-colors">
+                                🌐 View Original Research Paper on arXiv ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Methodologies & Contextual Paradigms -->
+                <div class="space-y-4">
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-white">Simulation Metrics &amp; Modeled Frameworks</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-slate-900/20 border border-slate-850 p-5 rounded-xl space-y-2">
+                            <h5 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Parallel Prefill Engine
+                            </h5>
+                            <p class="text-[11px] text-slate-400 leading-relaxed">
+                                GPU execution streams process prompts concurrently during prefill. This parallel hardware utilization is why doubling or tripling prompt blocks scales processing times negligibly compared to sequential generation token counts.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-900/20 border border-slate-850 p-5 rounded-xl space-y-2">
+                            <h5 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-indigo-400"></span> Causal Token Limitations
+                            </h5>
+                            <p class="text-[11px] text-slate-400 leading-relaxed">
+                                Transformers are constrained by left-to-right attention masks. Initial prompt instructions cannot reference downstream questions. Repeating instructions allows secondary passes to establish complete cross-sentence contexts.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-900/20 border border-slate-850 p-5 rounded-xl space-y-2">
+                            <h5 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-amber-400"></span> Metric Evaluations
+                            </h5>
+                            <p class="text-[11px] text-slate-400 leading-relaxed">
+                                Based on ARC, OpenBookQA, MATH, and custom Google benchmarks like NameIndex, confirming significant gains particularly on positional distractor matrices where spatial placement normally causes extraction failures.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clean, Modern Footer Section Styled after your past project -->
+        <footer class="border-t border-slate-900 pt-6 mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+            <div>
+                © 2026 Dhaval Kareliya. All rights reserved.
+            </div>
+            <div class="flex items-center gap-6 font-semibold">
+                <a href="https://linkedin.com" target="_blank" class="hover:text-indigo-400 transition-colors">LinkedIn</a>
+                <a href="https://github.com/Dhavalk21" target="_blank" class="hover:text-indigo-400 transition-colors">GitHub</a>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Core App Engine Logic -->
+    <script>
+        // Preset Datasets mapping to arXiv paper data (ARC, OpenBook, NameIndex, MATH, etc.)
+        const presets = {
+            nameindex: { 
+                name: "NameIndex Mid-Retrieval", 
+                baseAcc: 21, 
+                repAcc: 97, 
+                rep3Acc: 99, 
+                cotAcc: 85, 
+                isRetrieval: true,
+                tokens: ["Dale", "Lopez", ",", "Peter", "Sanchez", ",", "Allen", "Harris", ",", "Scott", "Davis", ",", "What", "is", "the", "25th", "name", "?"]
+            },
+            middlematch: { 
+                name: "MiddleMatch Disorientation", 
+                baseAcc: 45, 
+                repAcc: 78, 
+                rep3Acc: 92, 
+                cotAcc: 70, 
+                isRetrieval: true,
+                tokens: ["Carlos", "Davis", ",", "Dale", "Sims", ",", "Finnian", "Ross", ",", "What", "is", "the", "name", "directly", "between", "them", "?"]
+            },
+            multiplechoice_options: { 
+                name: "MMLU Options-First Sequence", 
+                baseAcc: 55, 
+                repAcc: 75, 
+                rep3Acc: 78, 
+                cotAcc: 74, 
+                isRetrieval: false,
+                tokens: ["A", "B", "C", "D", "Reply", "with", "letter", ".", "Which", "of", "these", "is", "a", "mixture", "?"]
+            },
+            multiplechoice_question: { 
+                name: "MMLU Question-First Sequence", 
+                baseAcc: 72, 
+                repAcc: 76, 
+                rep3Acc: 76, 
+                cotAcc: 82, 
+                isRetrieval: false,
+                tokens: ["Which", "of", "these", "is", "a", "mixture", "?", "A", "B", "C", "D", "Reply", "with", "letter", "."]
+            },
+            math_hard: { 
+                name: "MATH Hard Problem Set", 
+                baseAcc: 35, 
+                repAcc: 34, 
+                rep3Acc: 33, 
+                cotAcc: 68, 
+                isRetrieval: false,
+                tokens: ["Compute", "the", "derivative", "of", "the", "function", "x", "^", "3", "+", "2", "x", "at", "point", "2", "."]
+            }
+        };
+
+        // Active State Variables
+        let currentTab = 'sandbox';
+        let currentAttView = 'standard';
+        let currentMemoType = 'prd';
+        let localPresetCache = 'nameindex';
+
+        // Custom Toast Notification System (Replacing alerts)
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            // Set styles dynamically based on toast type
+            const bgClass = type === 'success' ? 'bg-emerald-950 border-emerald-900 text-emerald-400' :
+                            type === 'error' ? 'bg-rose-950 border-rose-900 text-rose-400' :
+                            'bg-slate-900 border-slate-800 text-slate-300';
+            
+            toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-xl border text-xs font-semibold shadow-2xl transition-all duration-300 transform translate-x-12 opacity-0 pointer-events-auto ${bgClass}`;
+            toast.innerHTML = `
+                <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation frame for transition
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-x-12', 'opacity-0');
+            });
+            
+            // Automate destruction loop
+            setTimeout(() => {
+                toast.classList.add('translate-x-12', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Tab Management Logic
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-indigo-500', 'text-indigo-400');
+                btn.classList.add('border-transparent', 'text-slate-400');
+            });
+
+            document.getElementById(`tabContent-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tabBtn-${tabId}`);
+            activeBtn.classList.remove('border-transparent', 'text-slate-400');
+            activeBtn.classList.add('border-indigo-500', 'text-indigo-400');
+
+            if (tabId === 'sandbox') {
+                updateSim();
+            }
+            if (tabId === 'attention') {
+                updateAttentionVisualization();
+            }
+            if (tabId === 'memo') {
+                updateMemoDocument();
+            }
+        }
+
+        // Toggle guide logic
+        function toggleGuide() {
+            const guide = document.getElementById('guideSection');
+            const btnText = document.getElementById('guideBtnText');
+            if (guide.style.maxHeight === '0px' || !guide.style.maxHeight) {
+                guide.style.maxHeight = guide.scrollHeight + 'px';
+                btnText.innerText = 'Hide Guide';
+                showNotification("Documentation Expanded", "success");
+            } else {
+                guide.style.maxHeight = '0px';
+                btnText.innerText = 'Show Guide';
+            }
+        }
+
+        // Dynamic Economic Evaluation Calculator (Standardized cloud pricing models)
+        function calculateOperationalUSD(inputTokens, outputTokens) {
+            // Enterprise standard: Input $0.075 per 1M, Output $0.30 per 1M
+            const inputRate = 0.075 / 1000000;
+            const outputRate = 0.30 / 1000000;
+            const runs = 100000; // 100k execution runs benchmark
+            return ((inputTokens * inputRate) + (outputTokens * outputRate)) * runs;
+        }
+
+        // --- SUB-LOGIC: SIMULATOR DYNAMICS & CHART ---
+        function updateSim() {
+            const presetKey = document.getElementById('presetSelect').value;
+            const modelKey = document.getElementById('modelSelect').value;
+            const basePromptSize = parseInt(document.getElementById('promptSizeSlider').value);
+            const prefillSpeed = parseInt(document.getElementById('prefillSpeedSlider').value);
+            const reasoningToggle = document.getElementById('reasoningToggle').checked;
+
+            localPresetCache = presetKey;
+            
+            // Update metric label outputs
+            document.getElementById('promptSizeVal').innerText = basePromptSize.toLocaleString() + " tkn";
+            document.getElementById('prefillSpeedVal').innerText = (prefillSpeed / 1000).toFixed(0) + "k t/s";
+
+            // Establish preset accuracies 
+            let data = {...presets[presetKey]};
+
+            if (reasoningToggle) {
+                // If reasoning layer is explicitly on, the values flatten out as noted in Appendix A.2 of paper
+                data.baseAcc = Math.max(data.baseAcc, data.cotAcc - 6);
+                data.repAcc = Math.min(98, data.baseAcc + 2);
+                data.rep3Acc = Math.min(98, data.baseAcc + 3);
+                data.cotAcc = Math.min(99, data.cotAcc + 2);
+            }
+
+            // Estimate operational processing times based on token metrics
+            const prefillTime = (basePromptSize / prefillSpeed) * 1000; // milliseconds
+            const generationTime = reasoningToggle ? 2200 : 200; // Step-by-step reasoning outputs take drastically longer
+
+            // Base response sizes (Output Generation Tokens)
+            const standardOutputSize = 50;
+            const reasoningOutputSize = reasoningToggle ? 1400 : 450;
+
+            const computedMetrics = {
+                baseline: { 
+                    name: "Baseline Prompt Strategy", 
+                    acc: data.baseAcc, 
+                    cost: basePromptSize, 
+                    costUSD: calculateOperationalUSD(basePromptSize, standardOutputSize),
+                    ms: prefillTime + 120, 
+                    color: "#64748b", 
+                    attr: "Raw Single Read" 
+                },
+                repeat: { 
+                    name: "Prompt Repetition (x2)", 
+                    acc: data.repAcc, 
+                    cost: basePromptSize * 2, 
+                    costUSD: calculateOperationalUSD(basePromptSize * 2, standardOutputSize),
+                    ms: (prefillTime * 1.05) + 120, 
+                    color: "#34d399", 
+                    attr: "Doubled Input (Parallel Ingest)" 
+                },
+                repeat3: { 
+                    name: "Prompt Repetition (x3)", 
+                    acc: data.rep3Acc, 
+                    cost: basePromptSize * 3, 
+                    costUSD: calculateOperationalUSD(basePromptSize * 3, standardOutputSize),
+                    ms: (prefillTime * 1.12) + 120, 
+                    color: "#60a5fa", 
+                    attr: "Tripled Input (Targeted Lookup)" 
+                },
+                cot: { 
+                    name: "Step-by-Step (CoT Chain)", 
+                    acc: data.cotAcc, 
+                    cost: basePromptSize + reasoningOutputSize, 
+                    costUSD: calculateOperationalUSD(basePromptSize, reasoningOutputSize),
+                    ms: prefillTime + generationTime, 
+                    color: "#fbbf24", 
+                    attr: "High Output Cost Penalty" 
+                }
+            };
+
+            renderParetoFrontier(computedMetrics);
+            renderTableGrid(computedMetrics);
+            updatePlaygroundPrompt();
+        }
+
+        function renderParetoFrontier(metrics) {
+            const svg = document.getElementById('paretoChart');
+            svg.innerHTML = '';
+
+            const width = 600;
+            const height = 320;
+            const padding = 50;
+
+            // Compute dynamic chart bounds
+            const maxCost = Math.max(...Object.values(metrics).map(m => m.cost)) * 1.15;
+            const minCost = 0;
+
+            const scaleX = (cost) => padding + ((cost - minCost) / (maxCost - minCost)) * (width - padding * 2);
+            const scaleY = (acc) => (height - padding) - (acc / 100) * (height - padding * 2);
+
+            // Print scale/grid alignments
+            let gridSvg = `<g stroke="#1e293b" stroke-width="1">`;
+            for (let percent = 20; percent <= 100; percent += 20) {
+                let yVal = scaleY(percent);
+                gridSvg += `<line x1="${padding}" y1="${yVal}" x2="${width - padding}" y2="${yVal}"></line>`;
+                gridSvg += `<text x="${padding - 12}" y="${yVal + 4}" fill="#475569" text-anchor="end" class="font-mono text-[9px] font-semibold">${percent}%</text>`;
+            }
+            gridSvg += `</g>`;
+
+            // Axis labels & lines
+            gridSvg += `
+                <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="#334155" stroke-width="1.5"></line>
+                <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="#334155" stroke-width="1.5"></line>
+                <text x="${width / 2}" y="${height - 12}" fill="#64748b" text-anchor="middle" class="text-[10px] uppercase font-bold tracking-wider">Estimated Context Footprint (Weighted Tokens)</text>
+                <text x="14" y="${height / 2}" fill="#64748b" text-anchor="middle" class="text-[10px] uppercase font-bold tracking-wider" transform="rotate(-90 14 ${height / 2})">Accuracy Rate (%)</text>
+            `;
+
+            // Draw line connecting the Pareto points in order of footprint cost
+            const orderedByCost = [metrics.baseline, metrics.repeat, metrics.repeat3, metrics.cot].sort((a,b) => a.cost - b.cost);
+            let linePath = `M ${scaleX(orderedByCost[0].cost)} ${scaleY(orderedByCost[0].acc)}`;
+            for (let idx = 1; idx < orderedByCost.length; idx++) {
+                linePath += ` L ${scaleX(orderedByCost[idx].cost)} ${scaleY(orderedByCost[idx].acc)}`;
+            }
+
+            let pathSvg = `<path d="${linePath}" fill="none" stroke="#312e81" stroke-width="2.5" stroke-dasharray="5 4" opacity="0.8"></path>`;
+
+            // Generate interactive points
+            let nodesSvg = '';
+            orderedByCost.forEach(node => {
+                const cx = scaleX(node.cost);
+                const cy = scaleY(node.acc);
+                nodesSvg += `
+                    <g class="group cursor-pointer">
+                        <circle cx="${cx}" cy="${cy}" r="7" fill="${node.color}" stroke="#090d16" stroke-width="2.5" class="transition-all duration-200 hover:scale-125 hover:stroke-indigo-400"></circle>
+                        <text x="${cx}" y="${cy - 12}" fill="#ffffff" class="text-[10px] font-bold font-sans" text-anchor="middle">${node.acc}%</text>
+                        <text x="${cx}" y="${cy + 22}" fill="#475569" class="text-[9px] font-mono" text-anchor="middle">${node.cost.toLocaleString()} t</text>
+                    </g>
+                `;
+            });
+
+            svg.innerHTML = gridSvg + pathSvg + nodesSvg;
+        }
+
+        // Render table grid elements dynamically
+        function renderTableGrid(metrics) {
+            const tbody = document.getElementById('metricTableBody');
+            tbody.innerHTML = '';
+
+            Object.values(metrics).forEach(m => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/60 transition-all border-b border-slate-800/20";
+                tr.innerHTML = `
+                    <td class="p-4 font-semibold text-white flex items-center gap-2.5">
+                        <span class="w-3 h-3 rounded-full border border-slate-950 shadow-sm" style="background-color: ${m.color}"></span>
+                        ${m.name}
+                    </td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-lg font-mono font-bold text-slate-950" style="background-color: ${m.color}">${m.acc}%</span></td>
+                    <td class="p-4 font-mono text-slate-400">${m.cost.toLocaleString()} tokens</td>
+                    <td class="p-4 font-mono text-emerald-400 font-bold">$${m.costUSD.toFixed(2)}</td>
+                    <td class="p-4 font-mono text-indigo-400 font-semibold">~${m.ms.toFixed(0)}ms</td>
+                    <td class="p-4 text-xs text-slate-400">${m.attr}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- SUB-LOGIC: ATTENTION GRAPHING VISUALIZER ---
+        function setAttentionView(viewMode) {
+            currentAttView = viewMode;
+            document.getElementById('attBtn-standard').className = viewMode === 'standard' ? 'bg-indigo-600/10 text-indigo-400 text-xs font-bold px-4 py-2 rounded-lg border border-indigo-900/50 focus:outline-none transition-all cursor-pointer' : 'bg-slate-900 text-slate-400 text-xs font-bold px-4 py-2 rounded-lg border border-slate-800 focus:outline-none transition-all cursor-pointer';
+            document.getElementById('attBtn-repeated').className = viewMode === 'repeated' ? 'bg-indigo-600/10 text-indigo-400 text-xs font-bold px-4 py-2 rounded-lg border border-indigo-900/50 focus:outline-none transition-all cursor-pointer' : 'bg-slate-900 text-slate-400 text-xs font-bold px-4 py-2 rounded-lg border border-slate-800 focus:outline-none transition-all cursor-pointer';
+            updateAttentionVisualization();
+        }
+
+        function updateAttentionVisualization() {
+            const presetKey = localPresetCache;
+            const schema = presets[presetKey];
+            const header = document.getElementById('attentionHeader');
+            const stream = document.getElementById('tokenStream');
+            
+            header.innerText = currentAttView === 'standard' ? 
+                `Standard Causal Sequence (Tokens process sequentially)` : 
+                `Repeated Bidirectional Ingestion Loop (Tokens look back to the parallel template)`;
+
+            stream.innerHTML = '';
+            let rawTokens = [...schema.tokens];
+
+            if (currentAttView === 'repeated') {
+                rawTokens = [...rawTokens, "[REPEAT]", "Let", "me", "repeat", "that", ":", ...schema.tokens];
+            }
+
+            rawTokens.forEach((tok, index) => {
+                const badge = document.createElement('div');
+                badge.className = `px-2.5 py-1 rounded text-[10px] font-mono select-none transition-all cursor-crosshair border ${tok === '[REPEAT]' ? 'bg-indigo-950 border-indigo-800 text-indigo-400 font-bold' : 'bg-slate-900 border-slate-850 hover:bg-indigo-900 hover:text-white'}`;
+                badge.innerText = tok;
+                badge.setAttribute('data-index', index);
+                
+                badge.onmouseover = () => drawAttentionArcs(index, rawTokens.length);
+                badge.onmouseout = clearAttentionArcs;
+                
+                stream.appendChild(badge);
+            });
+
+            clearAttentionArcs();
+        }
+
+        function drawAttentionArcs(activeIndex, totalCount) {
+            const svg = document.getElementById('attentionLinesSvg');
+            svg.innerHTML = '';
+            
+            const elements = document.querySelectorAll('#tokenStream > div');
+            if (!elements || elements.length === 0) return;
+
+            const svgRect = svg.getBoundingClientRect();
+
+            elements.forEach((el, index) => {
+                if (index > activeIndex) return;
+
+                const targetRect = el.getBoundingClientRect();
+                const startRect = elements[activeIndex].getBoundingClientRect();
+
+                const x1 = startRect.left - svgRect.left + (startRect.width / 2);
+                const y1 = startRect.top - svgRect.top;
+                const x2 = targetRect.left - svgRect.left + (targetRect.width / 2);
+                const y2 = targetRect.top - svgRect.top;
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const xmid = (x1 + x2) / 2;
+                const ymid = Math.min(y1, y2) - Math.abs(x1 - x2) * 0.15 - 15;
+                const d = `M ${x1} ${y1} Q ${xmid} ${ymid} ${x2} ${y2}`;
+
+                const isDirectConnection = (currentAttView === 'repeated' && index === activeIndex - (totalCount / 2));
+                const strokeColor = isDirectConnection ? '#10b981' : (index === activeIndex ? '#6366f1' : '#4f46e5');
+                const opacityVal = index === activeIndex ? '0.8' : (isDirectConnection ? '0.9' : '0.25');
+                const strokeWidth = isDirectConnection ? '2.5' : (index === activeIndex ? '2' : '1');
+
+                path.setAttribute('d', d);
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke', strokeColor);
+                path.setAttribute('stroke-width', strokeWidth);
+                path.setAttribute('opacity', opacityVal);
+                
+                svg.appendChild(path);
+            });
+        }
+
+        // Clear vector pathways
+        function clearAttentionArcs() {
+            const svg = document.getElementById('attentionLinesSvg');
+            svg.innerHTML = '';
+        }
+
+        // --- SUB-LOGIC: PLAYGROUND INTERFACE ---
+        function toggleApiSettings() {
+            const apiBlock = document.getElementById('apiSettingsBlock');
+            const toggle = document.getElementById('apiToggle');
+            if (toggle.checked) {
+                apiBlock.classList.remove('hidden');
+                showNotification("Live API integration enabled! Use sandbox or input a custom key.", "info");
+            } else {
+                apiBlock.classList.add('hidden');
+            }
+        }
+
+        function updatePlaygroundPrompt() {
+            const baseText = document.getElementById('playUserPrompt').value;
+            const pattern = document.getElementById('playPatternSelect').value;
+            const preview = document.getElementById('playFormattedPrompt');
+            const tokenBadge = document.getElementById('playTokenCount');
+            const costBadge = document.getElementById('playEstimatedCost');
+
+            let finalPrompt = baseText;
+            let costString = "1x baseline prefill footprint";
+            let estTokenVal = Math.round(baseText.length / 4);
+
+            if (pattern === 'rep_x2') {
+                finalPrompt = `${baseText}\n\nLet me repeat that:\n\n${baseText}`;
+                costString = "2x prefill size / Neutral latency";
+                estTokenVal *= 2;
+            } else if (pattern === 'rep_x3') {
+                finalPrompt = `Let me repeat that:\nLet me repeat that one more time:\n\n${baseText}\n\nLet me repeat that:\n\n${baseText}\n\nLet me repeat that one more time:\n\n${baseText}`;
+                costString = "3x prefill size / Parallel parallelized prefill";
+                estTokenVal *= 3;
+            }
+
+            preview.innerText = finalPrompt;
+            tokenBadge.innerText = estTokenVal.toLocaleString() + " t";
+            costBadge.innerText = costString;
+        }
+
+        async function runPlaygroundInference() {
+            const prompt = document.getElementById('playFormattedPrompt').innerText;
+            const output = document.getElementById('playResponseOutput');
+            const status = document.getElementById('playgroundStatus');
+            const liveApiEnabled = document.getElementById('apiToggle').checked;
+            const customKey = document.getElementById('customApiKey').value;
+
+            output.innerText = "";
+            status.innerText = "Evaluating Ingest Layer...";
+
+            if (!liveApiEnabled) {
+                let delay = 1500;
+                status.innerText = "Running GPU prefill simulation...";
+                setTimeout(() => {
+                    status.innerText = "Simulating Token Output generation...";
+                    setTimeout(() => {
+                        output.innerHTML = `<span class="text-indigo-400">[SIMULATION SUCCESSFUL]</span>\nBecause we utilized a repeated wrapper sequence, the engine safely established a deep semantic self-attention schema. On needle tasks, model failure drops to zero.\n\nTo run this request live, toggling 'Enable Live Gemini API Call' will route this pipeline using local resources directly to Google's real inference processors.`;
+                        status.innerText = "Complete";
+                        showNotification("Simulated evaluation completed smoothly.", "success");
+                    }, 1000);
+                }, delay);
+                return;
+            }
+
+            const apiKeyToUse = customKey || "";
+            status.innerText = "Connecting to Gemini Engine...";
+            
+            try {
+                const responseText = await fetchGeminiWithBackoff(prompt, apiKeyToUse);
+                output.innerText = responseText;
+                status.innerText = "Finished Execution";
+                showNotification("Live response generated successfully!", "success");
+            } catch (err) {
+                output.innerText = `Error running live evaluation:\n${err.message}\n\nPlease verify your custom API Key is active, or switch back to the local simulation container mode.`;
+                status.innerText = "Incomplete";
+                showNotification("Target system execution failure.", "error");
+            }
+        }
+
+        async function fetchGeminiWithBackoff(promptText, localKey) {
+            const targetKey = localKey || ""; 
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${targetKey}`;
+            
+            const requestPayload = {
+                contents: [{ parts: [{ text: promptText }] }]
+            };
+
+            let delay = 1000;
+            for (let retry = 0; retry < 5; retry++) {
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestPayload)
+                    });
+                    if (response.ok) {
+                        const json = await response.json();
+                        return json.candidates?.[0]?.content?.parts?.[0]?.text || "Empty response returned from model.";
+                    }
+                } catch (e) {
+                    // Fail silently and queue retry
+                }
+                await new Promise(res => setTimeout(res, delay));
+                delay *= 2;
+            }
+            throw new Error("Unable to establish communication with Gemini 2.5 after 5 sequential transmission retries.");
+        }
+
+        // --- SUB-LOGIC: SPECIFICATION MEMO GENERATOR ---
+        function selectMemoType(type) {
+            currentMemoType = type;
+            document.getElementById('memoType-prd').className = type === 'prd' ? 'w-full text-left bg-indigo-600/10 text-xs font-bold p-4 rounded-xl border border-indigo-900/50 flex flex-col gap-1 transition-all cursor-pointer' : 'w-full text-left bg-slate-950 text-xs font-bold p-4 rounded-xl border border-slate-900 hover:bg-slate-900 flex flex-col gap-1 transition-all cursor-pointer';
+            document.getElementById('memoType-cost').className = type === 'cost' ? 'w-full text-left bg-indigo-600/10 text-xs font-bold p-4 rounded-xl border border-indigo-900/50 flex flex-col gap-1 transition-all cursor-pointer' : 'w-full text-left bg-slate-950 text-xs font-bold p-4 rounded-xl border border-slate-900 hover:bg-slate-900 flex flex-col gap-1 transition-all cursor-pointer';
+            
+            updateMemoDocument();
+        }
+
+        function updateMemoDocument() {
+            const presetKey = localPresetCache;
+            const modelKey = document.getElementById('modelSelect').value;
+            const basePromptSize = parseInt(document.getElementById('promptSizeSlider').value);
+            const memoArea = document.getElementById('memoDocDisplay');
+
+            let template = '';
+            if (currentMemoType === 'prd') {
+                template = `## TECHNICAL PRD SPECIFICATION (INTEGRATION MODULE)
+Ref: SPEC-PROMPT-REPETITION-${presetKey.toUpperCase()}
+Target Release Block: AI Orchestration Layer - Core Prompt Assembly
+Model Context Architecture: ${modelKey.toUpperCase()}
+
+### 1. Functional Context
+Deploying repeated instructional packages to the prompt processing stream. By feeding identical prompt wraps back-to-back, the self-attention network retains high context lookups, particularly within the mid-sequence of massive data arrays.
+
+### 2. Operational Metrics Profile
+* **Target Objective:** Mitigate 'Middle-of-Context' loss on ${presets[presetKey].name} tasks.
+* **Accuracy Improvement Factor:** Projected jump of +${(presets[presetKey].repAcc - presets[presetKey].baseAcc)}% without writing internal reasoning paths.
+* **System Resource Scale Impact:** - Input Token Footprint: Incremental scaling to ${basePromptSize * 2} tokens.
+  - End-to-End Latency Penalty: Bound tightly to parallelized prefill processing scales (&Delta; &approx; 0ms).
+
+### 3. Native Integration Structure
+Wrap all pipeline execution contexts with the Verbose Duplication Wrapper:
+
+\`\`\`text
+[BASE_PROMPT_INSTRUCTIONS]
+
+Let me repeat that:
+
+[BASE_PROMPT_INSTRUCTIONS]
+\`\`\``;
+            } else {
+                template = `## STRATEGIC UNIT ECONOMICS & OPTIMIZATION BRIEF
+Executive Target: Platform Engineering Strategy
+Subject: Mitigating Prompt Ingestion & Reasoning Costs via arXiv:2512.14982
+Pipeline Focus: ${presets[presetKey].name} Tasks
+
+### 1. Executive Summary
+Traditional prompt optimization frameworks focus on "Chain of Thought" (CoT) structures. While accurate, CoT relies on producing verbose output generation sequences. This results in costly, slow sequential token generation loops.
+
+### 2. Cost Analysis Matrix
+* **Target Engine Matrix:** ${modelKey.toUpperCase()}
+* **Traditional CoT Strategy:** Lowers baseline throughput, increases expensive egress token volumes.
+* **Prompt Repetition Solution:** Doubles input prefill token volume. Because input tokens are typically 3x to 5x cheaper than output generation tokens, and read instantly in parallel, prompt repetition provides equivalent quality with significantly lower operational overhead.
+
+### 3. Recommended Rollout
+Initiate automated prompt wrappers across high-volume extraction nodes to maximize financial ROI while protecting latency constraints.`;
+            }
+
+            memoArea.value = template;
+        }
+
+        function copyMemoToClipboard() {
+            const display = document.getElementById('memoDocDisplay');
+            display.select();
+            document.execCommand('copy');
+            showNotification("Strategic Memo copied directly to clipboard!", "success");
+        }
+
+        // Initialize and bind core events on DOM Load
+        window.onload = function() {
+            updateSim();
+            updatePlaygroundPrompt();
+            
+            document.getElementById('playUserPrompt').addEventListener('input', updatePlaygroundPrompt);
+        };
+    </script>
+</body>
+</html>
